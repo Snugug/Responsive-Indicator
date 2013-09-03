@@ -15,19 +15,6 @@
   //////////////////////////////
   // Utilities
   //////////////////////////////
-  // Localstorage Test
-  function supports_html5_storage() {
-    // Please see https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-    // for details.
-    var mod = 'ResponsiveIndicator';
-    try {
-      localStorage.setItem(mod, mod);
-      localStorage.removeItem(mod);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
 
   // Returns a function, that, as long as it continues to be invoked, will not
   // be triggered. The function will be called after it stops being called for N
@@ -135,37 +122,30 @@
     var widthPX = window.innerWidth;
     var widthEM = widthPX / 16;
 
-    if (supports_html5_storage()) {
-      var viewportStatus = localStorage.getItem('ResponsiveViewportStorage');
+    var viewportStatus = localStorage.getItem('ResponsiveViewportStorage');
 
-      if (viewportStatus === 'px') {
-        viewportIndicator.innerHTML = widthPX + 'px';
-      }
-      else if (viewportStatus === 'em') {
-        viewportIndicator.innerHTML = widthEM + 'em';
-      }
-      else {
-        viewportIndicator.innerHtml = widthEM + 'em';
-        localStorage.setItem('ResponsiveViewportStorage', 'em');
-      }
+    if (viewportStatus === 'px') {
+      viewportIndicator.innerHTML = widthPX + 'px';
+    }
+    else if (viewportStatus === 'em') {
+      viewportIndicator.innerHTML = widthEM + 'em';
     }
     else {
       viewportIndicator.innerHtml = widthEM + 'em';
+      localStorage.setItem('ResponsiveViewportStorage', 'em');
     }
   }
 
   function modernizr_debug() {
-    if (supports_html5_storage()) {
-      var modernizrStatus = localStorage.getItem('ResponsiveModernizrStorage');
+    var modernizrStatus = localStorage.getItem('ResponsiveModernizrStorage');
 
-      if (modernizrStatus === 'open') {
-        removeClass(modernizrIndicator, 'closed');
-        addClass(modernizrIndicator, 'open');
-      }
-      else if (modernizrStatus === 'closed') {
-        removeClass(modernizrIndicator, 'open');
-        addClass(modernizrIndicator, 'closed');
-      }
+    if (modernizrStatus === 'open') {
+      removeClass(modernizrIndicator, 'closed');
+      addClass(modernizrIndicator, 'open');
+    }
+    else if (modernizrStatus === 'closed') {
+      removeClass(modernizrIndicator, 'open');
+      addClass(modernizrIndicator, 'closed');
     }
   }
 
@@ -177,74 +157,63 @@
   window.onload = function () {
     viewportIndicator.innerHtml = window.innerWidth;
 
-    if (supports_html5_storage()) {
-      var viewportVisible = localStorage.getItem('ResponsiveViewportVisible');
-      var modernizrVisible = localStorage.getItem('ResponsiveModernizrVisible');
+    var viewportVisible = localStorage.getItem('ResponsiveViewportVisible');
+    var modernizrVisible = localStorage.getItem('ResponsiveModernizrVisible');
 
-      if (viewportVisible === null) {
-        viewportVisible = true;
-      }
-      if (modernizrVisible === null) {
-        modernizrVisible = true;
-      }
+    if (viewportVisible === null) {
+      viewportVisible = true;
+    }
+    if (modernizrVisible === null) {
+      modernizrVisible = true;
+    }
 
-      if (viewportVisible) {
-        indicatorWrapper.appendChild(viewportIndicator);
-      }
-      if (modernizrVisible) {
-        indicatorWrapper.appendChild(modernizrIndicator);
-      }
-    } else {
+    if (viewportVisible !== 'false') {
       indicatorWrapper.appendChild(viewportIndicator);
+    }
+    if (modernizrVisible !== 'false') {
       indicatorWrapper.appendChild(modernizrIndicator);
     }
+
     document.body.appendChild(indicatorWrapper);
     document.body.appendChild(indicatorStyling);
 
     viewport_width();
 
-    var modernizrDebug = document.getElementById('responsive-modernizr-debug');
-
     // Viewport Event Listener
     viewportIndicator.addEventListener('click', function () {
-      if (supports_html5_storage()) {
-        var viewportStatus = localStorage.getItem('ResponsiveViewportStorage');
+      var viewportStatus = localStorage.getItem('ResponsiveViewportStorage');
 
-        if (viewportStatus === 'px') {
-          localStorage.setItem('ResponsiveViewportStorage', 'em');
-        }
-        else if (viewportStatus === 'em') {
-          localStorage.setItem('ResponsiveViewportStorage', 'px');
-        }
-
-        viewport_width();
+      if (viewportStatus === 'px') {
+        localStorage.setItem('ResponsiveViewportStorage', 'em');
       }
+      else if (viewportStatus === 'em') {
+        localStorage.setItem('ResponsiveViewportStorage', 'px');
+      }
+      viewport_width();
     });
 
     // Modernizr Event Listener
-    if (modernizrDebug) {
-      modernizrIndicator.innerHTML = document.getElementsByTagName('html')[0].classList;
+    modernizrIndicator.innerHTML = document.getElementsByTagName('html')[0].classList;
 
+    var modernizrStatus = localStorage.getItem('ResponsiveModernizrStorage');
+
+    if (modernizrStatus === 'closed') {
+      removeClass(modernizrIndicator, 'open');
+      addClass(modernizrIndicator, 'closed');
+    }
+
+    modernizrIndicator.addEventListener('click', function () {
       var modernizrStatus = localStorage.getItem('ResponsiveModernizrStorage');
 
       if (modernizrStatus === 'closed') {
-        removeClass(modernizrIndicator, 'open');
-        addClass(modernizrIndicator, 'closed');
+        localStorage.setItem('ResponsiveModernizrStorage', 'open');
+      }
+      else {
+        localStorage.setItem('ResponsiveModernizrStorage', 'closed');
       }
 
-      modernizrIndicator.addEventListener('click', function () {
-        var modernizrStatus = localStorage.getItem('ResponsiveModernizrStorage');
-
-        if (modernizrStatus === 'closed') {
-          localStorage.setItem('ResponsiveModernizrStorage', 'open');
-        }
-        else {
-          localStorage.setItem('ResponsiveModernizrStorage', 'closed');
-        }
-
-        modernizr_debug();
-      });
-    }
+      modernizr_debug();
+    });
   };
 
   window.onresize = debounce(function () {
