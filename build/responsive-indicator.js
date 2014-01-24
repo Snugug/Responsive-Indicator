@@ -11,10 +11,25 @@
  *  - Open/Close with click/tap
  *
  */
-(function () {
+(function (domready) {
   //////////////////////////////
   // Utilities
   //////////////////////////////
+
+  //////////////////////////////
+  // Add event (cross browser)
+  // From http://stackoverflow.com/a/10150042
+  //////////////////////////////
+  function addEvent(elem, event, fn) {
+    if (elem.addEventListener) {
+      elem.addEventListener(event, fn, false);
+    } else {
+      elem.attachEvent('on' + event, function () {
+        // set the this pointer same as addEventListener when fn is called
+        return (fn.call(elem, window.event));
+      });
+    }
+  }
 
   // Returns a function, that, as long as it continues to be invoked, will not
   // be triggered. The function will be called after it stops being called for N
@@ -149,12 +164,7 @@
     }
   }
 
-  //////////////////////////////
-  // Document Binding
-  //////////////////////////////
-  document.onkeydown = indicatorToggle;
-
-  window.onload = function () {
+  function initialLoad() {
     viewportIndicator.innerHtml = window.innerWidth;
 
     var viewportVisible = localStorage.getItem('ResponsiveViewportVisible');
@@ -214,10 +224,22 @@
 
       modernizr_debug();
     });
-  };
+  }
 
-  window.onresize = debounce(function () {
+  //////////////////////////////
+  // Document Binding
+  //////////////////////////////
+  addEvent(document, 'onkeydown', indicatorToggle);
+
+  if (domready) {
+    domready(initialLoad);
+  }
+  else {
+    addEvent(window, 'DOMContentLoaded', initialLoad);
+  }
+
+  addEvent(window, 'resize', debounce(function () {
     viewport_width();
-  }, 20);
+  }, 20));
 
-})();
+})(window.domready);

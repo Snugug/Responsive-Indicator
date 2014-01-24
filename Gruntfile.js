@@ -34,6 +34,24 @@
         }
       },
 
+      //////////////////////////////
+      // Compress
+      //////////////////////////////
+      compress: {
+        dist: {
+          options: {
+            mode: 'gzip'
+          },
+          files: [{
+            expand: true,
+            cwd: 'dist',
+            src: ['**/*.min.js'],
+            dest: 'dist',
+            ext: '.gz.js'
+          }]
+        }
+      },
+
       bump: {
         options: {
           files: [
@@ -61,7 +79,7 @@
     // Build
     //////////////////////////////
     grunt.registerTask('build', 'Builds distribution code', function() {
-      grunt.task.run('jshint', 'uglify');
+      grunt.task.run('jshint', 'uglify', 'compress');
     });
   };
 }());

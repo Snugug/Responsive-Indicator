@@ -8,7 +8,8 @@
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-bump": "0.0.6",
-    "matchdep": "~0.1.2"
+    "matchdep": "~0.1.2",
+    "grunt-contrib-compress": "~0.6.0"
   },
   "engines": {
     "node": ">=0.8.0"
